@@ -5,7 +5,7 @@ if (!isLoggedIn()) {
     exit;
 }
 include("header.php");
-$r = redisLink();
+//$r = redisLink();
 ?>
 <div id="postform">
 <form method="POST" action="post.php">
@@ -17,8 +17,8 @@ $r = redisLink();
 </table>
 </form>
 <div id="homeinfobox">
-<?=$r->zcard("followers:".$User['id'])?> followers<br>
-<?=$r->zcard("following:".$User['id'])?> following<br>
+<?=barScoreManager()->lookup("followers:".$User['id'])->size()?> followers<br>
+<?=barScoreManager()->lookup("following:".$User['id'])->size()?> following<br>
 </div>
 </div>
 <?

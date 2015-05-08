@@ -10,21 +10,25 @@ if (gt("password") != gt("password2"))
 # The form is ok, check if the username is available
 $username = gt("username");
 $password = gt("password");
-$r = redisLink();
-if ($r->hget("users",$username))
+//$r = redisLink();
+if (barMapManager()->lookup("users")->get($username))
     goback("Sorry the selected username is already in use.");
 
 # Everything is ok, Register the user!
-$userid = $r->incr("next_user_id");
+$userid = barCounterManager()->lookup("next_user_id")->increment(1);
 $authsecret = getrand();
-$r->hset("users",$username,$userid);
-$r->hmset("user:$userid",
-    "username",$username,
-    "password",$password,
-    "auth",$authsecret);
-$r->hset("auths",$authsecret,$userid);
+barMapManager()->lookup("users")->put($username,$userid);
+barMapManager()->lookup("user:$userid")->put("username",$username);
+barMapManager()->lookup("user:$userid")->put("password",$password);
+barMapManager()->lookup("user:$userid")->put("auth",$authsecret);
+// XXX: add REST json support
+//barMapManager()->lookup("user:$userid")->putMap(array(
+//    "username"=>$username,
+//    "password"=>$password,
+//    "auth"=>$authsecret));
+barMapManager()->lookup("auths")->put($authsecret,$userid);
 
-$r->zadd("users_by_time",time(),$username);
+barScoreManager()->lookup("users_by_time")->put($username, time());
 
 # User registered! Login her / him.
 setcookie("auth",$authsecret,time()+3600*24*365);

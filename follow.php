@@ -1,9 +1,9 @@
 <?
 include("retwis.php");
 
-$r = redisLink();
+//$r = redisLink();
 if (!isLoggedIn() || !gt("uid") || gt("f") === false ||
-    !($username = $r->hget("user:".gt("uid"),"username"))) {
+    !($username = barMapManager()->lookup("user:".gt("uid"))->get("username"))) {
     header("Location:index.php");
     exit;
 }
@@ -12,11 +12,11 @@ $f = intval(gt("f"));
 $uid = intval(gt("uid"));
 if ($uid != $User['id']) {
     if ($f) {
-        $r->zadd("followers:".$uid,time(),$User['id']);
-        $r->zadd("following:".$User['id'],time(),$uid);
+        barScoreManager()->lookup("followers:".$uid)->put($User['id'],time());
+        barScoreManager()->lookup("following:".$User['id'])->put($uid,time());
     } else {
-        $r->zrem("followers:".$uid,$User['id']);
-        $r->zrem("following:".$User['id'],$uid);
+        barScoreManager()->lookup("followers:".$uid)->remove($User['id']);
+        barScoreManager()->lookup("following:".$User['id'])->remove($uid);
     }
 }
 header("Location: profile.php?u=".urlencode($username));

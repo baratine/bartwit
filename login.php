@@ -8,16 +8,16 @@ if (!gt("username") || !gt("password"))
 # The form is ok, check if the username is available
 $username = gt("username");
 $password = gt("password");
-$r = redisLink();
-$userid = $r->hget("users",$username);
+//$r = redisLink();
+$userid = barMapManager()->lookup("users")->get($username);
 if (!$userid)
     goback("Wrong username or password");
-$realpassword = $r->hget("user:$userid","password");
+$realpassword = barMapManager()->lookup("user:$userid")->get("password");
 if ($realpassword != $password)
     goback("Wrong useranme or password");
 
 # Username / password OK, set the cookie and redirect to index.php
-$authsecret = $r->hget("user:$userid","auth");
+$authsecret = barMapManager()->lookup("user:$userid")->get("auth");
 setcookie("auth",$authsecret,time()+3600*24*365);
 header("Location: index.php");
 ?>

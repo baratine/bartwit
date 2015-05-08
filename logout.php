@@ -6,14 +6,14 @@ if (!isLoggedIn()) {
     exit;
 }
 
-$r = redisLink();
+//$r = redisLink();
 $newauthsecret = getrand();
 $userid = $User['id'];
-$oldauthsecret = $r->hget("user:$userid","auth");
+$oldauthsecret = barMapManager()->lookup("user:$userid")->get("auth");
 
-$r->hset("user:$userid","auth",$newauthsecret);
-$r->hset("auths",$newauthsecret,$userid);
-$r->hdel("auths",$oldauthsecret);
+barMapManager()->lookup("user:$userid")->put("auth",$newauthsecret);
+barMapManager()->lookup("auths")->put($newauthsecret, $userid);
+barMapManager()->lookup("auths")->remove($oldauthsecret);
 
 header("Location: index.php");
 ?>

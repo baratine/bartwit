@@ -1,6 +1,8 @@
 <?
-require 'Predis/Autoloader.php';
-Predis\Autoloader::register();
+//require 'Predis/Autoloader.php';
+//Predis\Autoloader::register();
+
+require_once 'baratine-php/baratine-cache.php';
 
 function getrand() {
     $fd = fopen("/dev/urandom","r");
@@ -15,10 +17,10 @@ function isLoggedIn() {
     if (isset($User)) return true;
 
     if (isset($_COOKIE['auth'])) {
-        $r = redisLink();
+        //$r = redisLink();
         $authcookie = $_COOKIE['auth'];
-        if ($userid = $r->hget("auths",$authcookie)) {
-            if ($r->hget("user:$userid","auth") != $authcookie) return false;
+        if ($userid = barMapManager()->lookup("auths")->get($authcookie)) {
+            if (barMapManager()->lookup("user:$userid")->get("auth") != $authcookie) return false;
             loadUserInfo($userid);
             return true;
         }
@@ -29,19 +31,62 @@ function isLoggedIn() {
 function loadUserInfo($userid) {
     global $User;
 
-    $r = redisLink();
+    //$r = redisLink();
     $User['id'] = $userid;
-    $User['username'] = $r->hget("user:$userid","username");
+    $User['username'] = barMapManager()->lookup("user:$userid")->get("username");
     return true;
 }
 
-function redisLink() {
-    static $r = false;
+//function redisLink() {
+//    static $r = false;
+//
+//    if ($r) return $r;
+//    $r = new Predis\Client();
+//    return $r;
+//}
 
-    if ($r) return $r;
-    $r = new Predis\Client();
-    return $r;
+function getBaratineUrl() {
+   static $barUrl = 'http://localhost:8085/s/pod';
+   
+   return $barUrl;
 }
+
+function barMapManager() {
+    static $barMapManager = null;
+    
+    if ($barMapManager) return $barMapManager;
+    $barMapManager = new \baratine\cache\MapManagerService(getBaratineUrl());
+    
+    return $barMapManager;
+}
+
+function barListManager() {
+    static $barListManager = null;
+    
+    if ($barListManager) return $barListManager;
+    $barListManager = new \baratine\cache\ListManagerService(getBaratineUrl());
+    
+    return $barListManager;
+}
+
+function barScoreManager() {
+    static $barScoreManager = null;
+    
+    if ($barScoreManager) return $barScoreManager;
+    $barScoreManager = new \baratine\cache\ScoreManagerService(getBaratineUrl());
+    
+    return $barScoreManager;
+}
+
+function barCounterManager() {
+    static $barCounterManager = null;
+    
+    if ($barCounterManager) return $barCounterManager;
+    $barCounterManager = new \baratine\cache\CounterManagerService(getBaratineUrl());
+    
+    return $barCounterManager;
+}
+
 
 # Access to GET/POST/COOKIE parameters the easy way
 function g($param) {
@@ -87,12 +132,12 @@ function strElapsed($t) {
 }
 
 function showPost($id) {
-    $r = redisLink();
-    $post = $r->hgetall("post:$id");
+    //$r = redisLink();
+    $post = barMapManager()->lookup("post:$id")->getAll();
     if (empty($post)) return false;
 
     $userid = $post['user_id'];
-    $username = $r->hget("user:$userid","username");
+    $username = barMapManager()->lookup("user:$userid")->get("username");
     $elapsed = strElapsed($post['time']);
     $userlink = "<a class=\"username\" href=\"profile.php?u=".urlencode($username)."\">".utf8entities($username)."</a>";
 
@@ -102,9 +147,9 @@ function showPost($id) {
 }
 
 function showUserPosts($userid,$start,$count) {
-    $r = redisLink();
+    //$r = redisLink();
     $key = ($userid == -1) ? "timeline" : "posts:$userid";
-    $posts = $r->lrange($key,$start,$start+$count);
+    $posts = barListManager()->lookup($key)->getRange($start,$start+$count);
     $c = 0;
     foreach($posts as $p) {
         if (showPost($p)) $c++;
@@ -134,8 +179,9 @@ function showUserPostsWithPagination($username,$userid,$start,$count) {
 }
 
 function showLastUsers() {
-    $r = redisLink();
-    $users = $r->zrevrange("users_by_time",0,9);
+    //$r = redisLink();
+    $users = barScoreManager()->lookup("users_by_time")->getRangeDescendingKeys(0,9);
+    
     echo("<div>");
     foreach($users as $u) {
         echo("<a class=\"username\" href=\"profile.php?u=".urlencode($u)."\">".utf8entities($u)."</a> ");
