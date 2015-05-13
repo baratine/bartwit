@@ -182,7 +182,7 @@ class ListService
 
 class ScoreManagerService extends Service
 {
-  function __construct(/* string */ $url, /* string */ $serviceName = '/score')
+  function __construct(/* string */ $url, /* string */ $serviceName = '/tree')
   {
     parent::__construct($url, $serviceName);
   }

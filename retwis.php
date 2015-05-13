@@ -4,47 +4,6 @@
 
 require_once 'baratine-php/baratine-cache.php';
 
-function getrand() {
-    $fd = fopen("/dev/urandom","r");
-    $data = fread($fd,16);
-    fclose($fd);
-    return md5($data);
-}
-
-function isLoggedIn() {
-    global $User, $_COOKIE;
-
-    if (isset($User)) return true;
-
-    if (isset($_COOKIE['auth'])) {
-        //$r = redisLink();
-        $authcookie = $_COOKIE['auth'];
-        if ($userid = barMapManager()->lookup("auths")->get($authcookie)) {
-            if (barMapManager()->lookup("user:$userid")->get("auth") != $authcookie) return false;
-            loadUserInfo($userid);
-            return true;
-        }
-    }
-    return false;
-}
-
-function loadUserInfo($userid) {
-    global $User;
-
-    //$r = redisLink();
-    $User['id'] = $userid;
-    $User['username'] = barMapManager()->lookup("user:$userid")->get("username");
-    return true;
-}
-
-//function redisLink() {
-//    static $r = false;
-//
-//    if ($r) return $r;
-//    $r = new Predis\Client();
-//    return $r;
-//}
-
 function getBaratineUrl() {
    static $barUrl = 'http://localhost:8085/s/pod';
    
@@ -87,6 +46,46 @@ function barCounterManager() {
     return $barCounterManager;
 }
 
+function getrand() {
+    $fd = fopen("/dev/urandom","r");
+    $data = fread($fd,16);
+    fclose($fd);
+    return md5($data);
+}
+
+function isLoggedIn() {
+    global $User, $_COOKIE;
+
+    if (isset($User)) return true;
+
+    if (isset($_COOKIE['auth'])) {
+        //$r = redisLink();
+        $authcookie = $_COOKIE['auth'];
+        if ($userid = barMapManager()->lookup("auths")->get($authcookie)) {
+            if (barMapManager()->lookup("user:$userid")->get("auth") != $authcookie) return false;
+            loadUserInfo($userid);
+            return true;
+        }
+    }
+    return false;
+}
+
+function loadUserInfo($userid) {
+    global $User;
+
+    //$r = redisLink();
+    $User['id'] = $userid;
+    $User['username'] = barMapManager()->lookup("user:$userid")->get("username");
+    return true;
+}
+
+//function redisLink() {
+//    static $r = false;
+//
+//    if ($r) return $r;
+//    $r = new Predis\Client();
+//    return $r;
+//}
 
 # Access to GET/POST/COOKIE parameters the easy way
 function g($param) {
