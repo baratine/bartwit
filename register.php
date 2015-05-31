@@ -11,24 +11,24 @@ if (gt("password") != gt("password2"))
 $username = gt("username");
 $password = gt("password");
 //$r = redisLink();
-if (barMapManager()->lookup("users")->get($username))
+if (lookupMap("/map/users")->get($username))
     goback("Sorry the selected username is already in use.");
 
 # Everything is ok, Register the user!
-$userid = barCounterManager()->lookup("next_user_id")->increment(1);
+$userid = lookupCounter("/counter/next_user_id")->increment(1);
 $authsecret = getrand();
-barMapManager()->lookup("users")->put($username,$userid);
-barMapManager()->lookup("user:$userid")->put("username",$username);
-barMapManager()->lookup("user:$userid")->put("password",$password);
-barMapManager()->lookup("user:$userid")->put("auth",$authsecret);
+lookupMap("/map/users")->put($username,$userid);
+lookupMap("/map/user:$userid")->put("username",$username);
+lookupMap("/map/user:$userid")->put("password",$password);
+lookupMap("/map/user:$userid")->put("auth",$authsecret);
 // XXX: add REST json support
 //barMapManager()->lookup("user:$userid")->putMap(array(
 //    "username"=>$username,
 //    "password"=>$password,
 //    "auth"=>$authsecret));
-barMapManager()->lookup("auths")->put($authsecret,$userid);
+lookupMap("/map/auths")->put($authsecret,$userid);
 
-barScoreManager()->lookup("users_by_time")->put($username, time());
+lookupTree("/tree/users_by_time")->put($username, time());
 
 # User registered! Login her / him.
 setcookie("auth",$authsecret,time()+3600*24*365);

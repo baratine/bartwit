@@ -9,11 +9,11 @@ if (!isLoggedIn()) {
 //$r = redisLink();
 $newauthsecret = getrand();
 $userid = $User['id'];
-$oldauthsecret = barMapManager()->lookup("user:$userid")->get("auth");
+$oldauthsecret = lookupMap("/map/user:$userid")->get("auth");
 
-barMapManager()->lookup("user:$userid")->put("auth",$newauthsecret);
-barMapManager()->lookup("auths")->put($newauthsecret, $userid);
-barMapManager()->lookup("auths")->remove($oldauthsecret);
+lookupMap("/map/user:$userid")->put("auth",$newauthsecret);
+lookupMap("/map/auths")->put($newauthsecret, $userid);
+lookupMap("/map/auths")->remove($oldauthsecret);
 
 header("Location: index.php");
 ?>

@@ -17,8 +17,8 @@ include("header.php");
 </table>
 </form>
 <div id="homeinfobox">
-<?=barScoreManager()->lookup("followers:".$User['id'])->size()?> followers<br>
-<?=barScoreManager()->lookup("following:".$User['id'])->size()?> following<br>
+<?=lookupTree("/tree/followers:".$User['id'])->size()?> followers<br>
+<?=lookupTree("/tree/following:".$User['id'])->size()?> following<br>
 </div>
 </div>
 <?

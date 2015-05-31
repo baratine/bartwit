@@ -9,15 +9,15 @@ if (!gt("username") || !gt("password"))
 $username = gt("username");
 $password = gt("password");
 //$r = redisLink();
-$userid = barMapManager()->lookup("users")->get($username);
+$userid = lookupMap("/map/users")->get($username);
 if (!$userid)
     goback("Wrong username or password");
-$realpassword = barMapManager()->lookup("user:$userid")->get("password");
+$realpassword = lookupMap("/map/user:$userid")->get("password");
 if ($realpassword != $password)
     goback("Wrong useranme or password");
 
 # Username / password OK, set the cookie and redirect to index.php
-$authsecret = barMapManager()->lookup("user:$userid")->get("auth");
+$authsecret = lookupMap("/map/user:$userid")->get("auth");
 setcookie("auth",$authsecret,time()+3600*24*365);
 header("Location: index.php");
 ?>
