@@ -2,6 +2,7 @@
 //require 'Predis/Autoloader.php';
 //Predis\Autoloader::register();
 
+require_once 'baratine-php/baratine-client.php';
 require_once 'baratine-php/baratine-cache.php';
 
 function getBaratineUrl() {
@@ -10,40 +11,35 @@ function getBaratineUrl() {
    return $barUrl;
 }
 
-function barMapManager() {
-    static $barMapManager = null;
-    
-    if ($barMapManager) return $barMapManager;
-    $barMapManager = new \baratine\cache\MapManagerService(getBaratineUrl());
-    
-    return $barMapManager;
+function getBaratineClient()
+{
+  static $barClient = null;
+  
+  if ($barClient == null) {
+    $barClient = \baratine\BaratineClient::create(getBaratineUrl());
+  }
+  
+  return $barClient;
 }
 
-function barListManager() {
-    static $barListManager = null;
-    
-    if ($barListManager) return $barListManager;
-    $barListManager = new \baratine\cache\ListManagerService(getBaratineUrl());
-    
-    return $barListManager;
+function lookupMap(/* string */ $url)
+{
+  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\MapService');
 }
 
-function barScoreManager() {
-    static $barScoreManager = null;
-    
-    if ($barScoreManager) return $barScoreManager;
-    $barScoreManager = new \baratine\cache\ScoreManagerService(getBaratineUrl());
-    
-    return $barScoreManager;
+function lookupList(/* string */ $url)
+{
+  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\ListService');
 }
 
-function barCounterManager() {
-    static $barCounterManager = null;
-    
-    if ($barCounterManager) return $barCounterManager;
-    $barCounterManager = new \baratine\cache\CounterManagerService(getBaratineUrl());
-    
-    return $barCounterManager;
+function lookupTree(/* string */ $url)
+{
+  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\TreeService');
+}
+
+function lookupCounter(/* string */ $url)
+{
+  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\CounterService');
 }
 
 function getrand() {
@@ -61,8 +57,8 @@ function isLoggedIn() {
     if (isset($_COOKIE['auth'])) {
         //$r = redisLink();
         $authcookie = $_COOKIE['auth'];
-        if ($userid = barMapManager()->lookup("auths")->get($authcookie)) {
-            if (barMapManager()->lookup("user:$userid")->get("auth") != $authcookie) return false;
+        if ($userid = lookupMap("/map/auths")->get($authcookie)) {
+            if (lookupMap("/map/user:$userid")->get("auth") != $authcookie) return false;
             loadUserInfo($userid);
             return true;
         }
@@ -75,7 +71,7 @@ function loadUserInfo($userid) {
 
     //$r = redisLink();
     $User['id'] = $userid;
-    $User['username'] = barMapManager()->lookup("user:$userid")->get("username");
+    $User['username'] = lookupMap("/map/user:$userid")->get("username");
     return true;
 }
 
@@ -132,11 +128,11 @@ function strElapsed($t) {
 
 function showPost($id) {
     //$r = redisLink();
-    $post = barMapManager()->lookup("post:$id")->getAll();
+    $post = (array) lookupMap("/map/post:$id")->getAll();
     if (empty($post)) return false;
 
     $userid = $post['user_id'];
-    $username = barMapManager()->lookup("user:$userid")->get("username");
+    $username = lookupMap("/map/user:$userid")->get("username");
     $elapsed = strElapsed($post['time']);
     $userlink = "<a class=\"username\" href=\"profile.php?u=".urlencode($username)."\">".utf8entities($username)."</a>";
 
@@ -148,7 +144,7 @@ function showPost($id) {
 function showUserPosts($userid,$start,$count) {
     //$r = redisLink();
     $key = ($userid == -1) ? "timeline" : "posts:$userid";
-    $posts = barListManager()->lookup($key)->getRange($start,$start+$count);
+    $posts = lookupList("/list/$key")->getRange($start,$start+$count);
     $c = 0;
     foreach($posts as $p) {
         if (showPost($p)) $c++;
@@ -179,7 +175,7 @@ function showUserPostsWithPagination($username,$userid,$start,$count) {
 
 function showLastUsers() {
     //$r = redisLink();
-    $users = barScoreManager()->lookup("users_by_time")->getRangeDescendingKeys(0,9);
+    $users = lookupTree("/tree/users_by_time")->getRangeDescendingKeys(0,9);
     
     echo("<div>");
     foreach($users as $u) {
