@@ -2,8 +2,8 @@
 //require 'Predis/Autoloader.php';
 //Predis\Autoloader::register();
 
-require_once 'baratine-php/baratine-client.php';
-require_once 'baratine-php/baratine-cache.php';
+require_once('baratine-php/baratine-client.php');
+require_once('baratine-php/baratine-bache.php');
 
 function getBaratineUrl() {
    static $barUrl = 'http://localhost:8085/s/pod';
@@ -24,22 +24,22 @@ function getBaratineClient()
 
 function lookupMap(/* string */ $url)
 {
-  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\MapService');
+  return getBaratineClient()->_lookup($url)->_as('\baratine\bache\MapService');
 }
 
 function lookupList(/* string */ $url)
 {
-  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\ListService');
+  return getBaratineClient()->_lookup($url)->_as('\baratine\bache\ListService');
 }
 
 function lookupTree(/* string */ $url)
 {
-  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\TreeService');
+  return getBaratineClient()->_lookup($url)->_as('\baratine\bache\TreeService');
 }
 
 function lookupCounter(/* string */ $url)
 {
-  return getBaratineClient()->lookup($url)->asClass('\baratine\cache\CounterService');
+  return getBaratineClient()->_lookup($url)->_as('\baratine\bache\CounterService');
 }
 
 function getrand() {

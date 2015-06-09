@@ -1,8 +1,6 @@
 <?php
 
-namespace baratine\cache;
-
-require_once('jamp-client.php');
+namespace baratine\bache;
 
 abstract class MapService
 {
