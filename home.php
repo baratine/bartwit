@@ -1,4 +1,4 @@
-<?
+<?php
 include("retwis.php");
 if (!isLoggedIn()) {
     header("Location: index.php");
@@ -21,7 +21,7 @@ include("header.php");
 <?=lookupTree("/tree/following:".$User['id'])->size()?> following<br>
 </div>
 </div>
-<?
+<?php
 $start = gt("start") === false ? 0 : intval(gt("start"));
 showUserPostsWithPagination(false,$User['id'],$start,10);
 include("footer.php")
