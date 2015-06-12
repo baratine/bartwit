@@ -6,9 +6,9 @@ require_once('baratine-php/baratine-client.php');
 require_once('baratine-php/baratine-bache.php');
 
 function getBaratineUrl() {
-   static $barUrl = 'http://localhost:8085/s/pod';
-   
-   return $barUrl;
+  static $barUrl = 'http://127.0.0.1:8085/s/pod';
+  
+  return $barUrl;
 }
 
 function getBaratineClient()
