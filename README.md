@@ -8,7 +8,7 @@ To run Bartwit
 
 2. download Bartwit into your web server that supports PHP (with curl)
 
-3. configure the Baratine host in bartwit/retwis.php, where the default is `http://localhost:8085/s/pod`
+3. configure the Baratine host in bartwit/retwis.php, where the default is `http://127.0.0.1:8085/s/pod`
 
 
 Bartwit vs Retwis Benchmark
