@@ -1,5 +1,5 @@
 Bartwit is a fork of [Retwis](http://redis.io/topics/twitter-clone) that uses a Baratine service as the backing
-storage instead of Redis.
+storage instead of Redis.  For a comparison between Bartwit and Retwis, see the [Bache service](https://github.com/baratine/bache).
 
 To run Bartwit
 --------------
