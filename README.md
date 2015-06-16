@@ -27,4 +27,4 @@ with bespoke functionality that better suits your specific application.
 
 Architecture
 ------------
-[architecture diagram]: bartwit.svg
+![architecture diagram](https://github.com/baratine/bartwit/blob/master/bartwit.png)
