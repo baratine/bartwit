@@ -23,3 +23,8 @@ For the same number of users and posts on `timeline.php`:
 Bartwit shows that for a real world application, Bache (and in turn Baratine) performs very competitively versus Redis. 
 The big difference is that Bache is just Java code packaged within a jar file; you can easily extend Bache
 with bespoke functionality that better suits your specific application.
+
+
+Architecture
+------------
+[architecture diagram]: bartwit.svg
